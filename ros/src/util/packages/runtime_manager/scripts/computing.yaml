@@ -7,6 +7,12 @@ subs :
     - name : gnss_localizer
       desc : gnss_localizer desc sample
       subs :
+      - name : mec_fix2tfpose
+        desc : mec_fix2tfpose desc sample
+        cmd  : roslaunch mec_gnss_localizer fix2tfpose.launch
+        param: gnss
+        gui  :
+          stat_topic : [ gnss ]
       - name : fix2tfpose
         desc : fix2tfpose desc sample
         cmd  : roslaunch gnss_localizer fix2tfpose.launch

@@ -12,6 +12,9 @@
   <arg name="get_height" default="false" />
   <arg name="use_local_transform" default="false" />
   <arg name="sync" default="false" />
+  <arg name="gnss_pose" default="/novatel/RTK/pose" />
+  <!-- <arg name="gnss_pose" default="/xsens/gps/pose" /> -->
+
 
   <node pkg="lidar_localizer" type="ndt_matching" name="ndt_matching" output="log">
     <param name="method_type" value="$(arg method_type)" />
@@ -24,7 +27,9 @@
     <param name="offset" value="$(arg offset)" />
     <param name="get_height" value="$(arg get_height)" />
     <param name="use_local_transform" value="$(arg use_local_transform)" />
+    <param name="gnss_pose" value="$(arg gnss_pose)" />
     <remap from="/points_raw" to="/sync_drivers/points_raw" if="$(arg sync)" />
+
   </node>
 
 </launch>

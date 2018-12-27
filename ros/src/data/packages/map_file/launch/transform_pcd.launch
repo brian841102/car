@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="transforrm_pcd" pkg="map_file" type="transform_pcd">
+    <param name="latitude" value="23.0000256774"/>
+    <param name="longitude" value="120.2228310777"/>
+    <param name="altitude" value="42.6999993920"/>
+
+    <param name="roll" value="0"/>
+    <param name="pitch" value="0"/>
+    <param name="yaw" value="4.8454437018"/>
+
+    <param name="input_filename" value="1105.pcd"/>
+    <param name="path" value="/home/mec/Documents/1105/"/>
+  </node>
+</launch>
+
+

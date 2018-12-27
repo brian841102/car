@@ -72,6 +72,12 @@
 
 #include <time.h>
 
+//WEN20180605
+#include <gps_common/GPSFix.h>
+#include <pcl_omp_registration/mec_transformation.h>
+#include <novatel_gps_msgs/Gpgga.h>
+
+
 struct pose
 {
   double x;
@@ -164,12 +170,41 @@ static bool _incremental_voxel_update = false;
 
 static std::string _imu_topic = "/imu_raw";
 
+//
+static std::string _rtk_topic = "/novatel/gps";
+static std::string _rtk_gga_topic = "/novatel/gpgga";
+
+//
+
 static double fitness_score;
 static bool has_converged;
 static int final_num_iteration;
 
 static sensor_msgs::Imu imu;
 static nav_msgs::Odometry odom;
+
+static Eigen::Matrix3f tf_enutomap; //WEN
+bool _use_rtk = false;//WEN
+
+// = = = = = = WEN = = = = = =
+xyz_InitTypeDef Lever_arm;
+llh_InitTypeDef llh0;
+llh_InitTypeDef llhA;
+enu_InitTypeDef enuA;
+unsigned int enu_initial = 0;
+gps_common::GPSFix msg_rtk;
+static void rtk_callback(const gps_common::GPSFix::ConstPtr& input){
+  msg_rtk = *input;
+}
+novatel_gps_msgs::Gpgga msg_gga;
+static void gga_callback(const novatel_gps_msgs::Gpgga::ConstPtr& input){
+  msg_gga = *input;
+}
+// = = = = = = WEN = = = = = =
+
+
+
+
 
 static void param_callback(const autoware_msgs::ConfigNdtMapping::ConstPtr& input)
 {
@@ -457,8 +492,62 @@ static void imu_callback(const sensor_msgs::Imu::Ptr& input)
   previous_imu_yaw = imu_yaw;
 }
 
+FILE *fp1,*fp2; // WEN 
 static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 {
+
+
+ // = = = = = = = = = = = = = WEN = = = = = = = = = = = = = = = = = =
+  static int scan_count = 0;
+  static double distance = 0;
+
+  double Alpha;
+  // base_link to antenna
+  Lever_arm.xx = 0.32;
+  Lever_arm.yy = -0.315;
+  Lever_arm.zz = 0.94;
+  //          X
+  //          ^
+  //          |
+  //          |
+  //          |
+  // Y--------- (body-frame : X-axis points forward direction
+  //                          Y-axis to the right
+  //                          Z-axis to the up )
+
+  if(enu_initial == 0){
+    llh0 = lever_arm(msg_rtk.latitude,msg_rtk.longitude,msg_rtk.altitude,0,0,msg_rtk.track,Lever_arm.xx,Lever_arm.yy,Lever_arm.zz);
+    //record initial pose
+    fprintf(fp1,"%.10f, %.10f, %.10f, %.10f\r",llh0.Lat, llh0.Lon,llh0.High,msg_rtk.track*PI/180);
+    fclose(fp1); //close file
+     
+    Eigen::AngleAxisf rot_x_enutomap(0, Eigen::Vector3f::UnitX());
+    Eigen::AngleAxisf rot_y_enutomap(0, Eigen::Vector3f::UnitY());
+    Alpha = 0.5*PI-(msg_rtk.track)*PI/180; //the angle between enu-frame and map-frame along z-axis
+    Eigen::AngleAxisf rot_z_enutomap(-Alpha, Eigen::Vector3f::UnitZ());
+
+    tf_enutomap = (rot_z_enutomap * rot_y_enutomap * rot_x_enutomap).matrix();//ENU frame to map frame
+    enu_initial = 1; // initialized 
+  }
+
+  llhA = lever_arm(msg_rtk.latitude,msg_rtk.longitude,msg_rtk.altitude,0,0,msg_rtk.track,Lever_arm.xx,Lever_arm.yy,Lever_arm.zz);
+  // std::cout <<"llhA"<<std::endl <<llhA.Lat <<std::endl<<llhA.Lon <<std::endl<<llhA.High <<std::endl;
+  static double init_heading = msg_rtk.track;
+  enuA = lla2enu(llh0.Lat, llh0.Lon, llh0.High,llhA.Lat, llhA.Lon, llhA.High); //base_link position in ENU by RTK
+  Eigen::Vector3f rtk_in_enu(enuA.e, enuA.n, enuA.u);
+  Eigen::Vector3f rtk_in_map = (tf_enutomap)*rtk_in_enu;//base_link position in map by RTK
+
+  // std::cout << "Alpha" <<std::endl << Alpha<<std::endl;
+  // std::cout << "tf_enutomap" <<std::endl << tf_enutomap<<std::endl;
+ 
+
+ // = = = = = = = = = = = = = WEN = = = = = = = = = = = = = = = = = =
+
+
+
+
+
+
   double r;
   pcl::PointXYZI p;
   pcl::PointCloud<pcl::PointXYZI> tmp, scan;
@@ -639,8 +728,57 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
   }
 #endif
 
-  t_base_link = t_localizer * tf_ltob;
 
+
+    // = = = = = = = = = = = WEN = = = = = = = = = = = = =
+
+    //Calculate the translation vector of base_link_to_localizer
+    Eigen::Vector3f b2l_in_base(_tf_x, _tf_y, _tf_z); //base_link to localizer(velodyne) vector in vehicle-frame(base_link)
+    Eigen::Matrix3f tf_basetomap;
+    Eigen::Vector3f b2l_in_map;//base_link to localizer(velodyne) vector in map-frame
+
+    Eigen::AngleAxisf rot_x(0, Eigen::Vector3f::UnitX());    
+    Eigen::AngleAxisf rot_y(0, Eigen::Vector3f::UnitY());
+    Eigen::AngleAxisf rot_z(-(msg_rtk.track-init_heading)*PI/180, Eigen::Vector3f::UnitZ());
+
+    tf_basetomap = (rot_x * rot_y * rot_z).matrix(); //the angle between vehicle-frame(base_link) and map-frame along z-axis
+    b2l_in_map = tf_basetomap * b2l_in_base;
+
+    if(_use_rtk && (msg_gga.gps_qual == 4 )){//|| msg_gga.gps_qual == 5
+      t_localizer(0, 3) = rtk_in_map(0, 0) + b2l_in_map(0, 0);
+      t_localizer(1, 3) = rtk_in_map(1, 0) + b2l_in_map(1, 0);
+      t_localizer(2, 3) = rtk_in_map(2, 0) + b2l_in_map(2, 0);
+      std::cout<<"Using RTK correction"<<std::endl;
+    }
+    std::cout<<"GPS fix type = "<<msg_gga.gps_qual<<std::endl;
+    Eigen::Matrix4f tmp1(Eigen::Matrix4f::Identity());
+
+    // Rotation + Translation representation
+    // [ R00 R01 R02 | T0]
+    // [ R10 R11 R12 | T1]
+    // [ R20 R21 R22 | T2]
+    // [  0    0   0 |  1]
+    
+    //Calculate rotation matrix of t_base_link
+    t_base_link = t_localizer * tf_ltob;
+    if(_use_rtk && (msg_gga.gps_qual == 4 )){
+      t_base_link(0, 3) = rtk_in_map(0, 0);
+      t_base_link(1, 3) = rtk_in_map(1, 0);
+      t_base_link(2, 3) = rtk_in_map(2, 0);
+    }
+    // = = = = = = = = = = = WEN = = = = = = = = = = = = =
+
+
+
+
+
+
+
+
+
+
+
+  // t_base_link = t_localizer * tf_ltob;
   pcl::transformPointCloud(*scan_ptr, *transformed_scan_ptr, t_localizer);
 
   tf::Matrix3x3 mat_l, mat_b;
@@ -821,6 +959,14 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
 int main(int argc, char** argv)
 {
+
+  // = = = WEN = = =
+  fp1 = fopen("initial_pose.txt","a"); //open a new file
+  fp2 = fopen("fitness_score.txt","a");
+  // = = = WEN = = =
+
+
+
   previous_pose.x = 0.0;
   previous_pose.y = 0.0;
   previous_pose.z = 0.0;
@@ -900,7 +1046,11 @@ int main(int argc, char** argv)
   _method_type = static_cast<MethodType>(method_type_tmp);
   private_nh.getParam("imu_upside_down", _imu_upside_down);
   private_nh.getParam("imu_topic", _imu_topic);
+  private_nh.getParam("rtk_topic", _rtk_topic);
+  private_nh.getParam("rtk_gga_topic", _rtk_gga_topic);
   private_nh.getParam("incremental_voxel_update", _incremental_voxel_update);
+
+  private_nh.getParam("use_rtk", _use_rtk);//WEN
 
   std::cout << "method_type: " << static_cast<int>(_method_type) << std::endl;
   std::cout << "use_odom: " << _use_odom << std::endl;
@@ -984,6 +1134,18 @@ int main(int argc, char** argv)
   ros::Subscriber points_sub = nh.subscribe("points_raw", 100000, points_callback);
   ros::Subscriber odom_sub = nh.subscribe("/vehicle/odom", 100000, odom_callback);
   ros::Subscriber imu_sub = nh.subscribe(_imu_topic, 100000, imu_callback);
+
+
+
+
+    // = = = WEN = = =
+  //ros::Subscriber rtk_sub = nh.subscribe("/gps", 100000, rtk_callback);
+  //ros::Subscriber gga_sub = nh.subscribe("/gpgga", 10000, gga_callback);
+  ros::Subscriber rtk_sub = nh.subscribe(_rtk_topic, 100000, rtk_callback);
+  ros::Subscriber gga_sub = nh.subscribe(_rtk_gga_topic, 10000, gga_callback);
+  // = = = WEN = = =
+
+
 
   ros::spin();
 

@@ -229,6 +229,7 @@ static bool _use_odom = false;
 static bool _imu_upside_down = false;
 
 static std::string _imu_topic = "/imu_raw";
+static std::string _gnss_pose = "/novatel/RTK/pose";
 
 static std::ofstream ofs;
 static std::string filename;
@@ -1514,6 +1515,7 @@ int main(int argc, char** argv)
   private_nh.getParam("use_odom", _use_odom);
   private_nh.getParam("imu_upside_down", _imu_upside_down);
   private_nh.getParam("imu_topic", _imu_topic);
+  private_nh.getParam("gnss_pose", _gnss_pose);
 
   if (nh.getParam("localizer", _localizer) == false)
   {
@@ -1619,7 +1621,9 @@ int main(int argc, char** argv)
 
   // Subscribers
   ros::Subscriber param_sub = nh.subscribe("config/ndt", 10, param_callback);
-  ros::Subscriber gnss_sub = nh.subscribe("gnss_pose", 10, gnss_callback);
+  ros::Subscriber gnss_sub = nh.subscribe(_gnss_pose.c_str(), 10, gnss_callback);
+  //ros::Subscriber gnss_sub = nh.subscribe("gnss_pose", 10, gnss_callback);
+  //ros::Subscriber gnss_sub = nh.subscribe("novatel/RTK/body_pose", 10, gnss_callback);
   //  ros::Subscriber map_sub = nh.subscribe("points_map", 1, map_callback);
   ros::Subscriber initialpose_sub = nh.subscribe("initialpose", 10, initialpose_callback);
   ros::Subscriber points_sub = nh.subscribe("filtered_points", _queue_size, points_callback);
