@@ -1,13 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(requirements_version_checker)
-
-find_package(OpenCV REQUIRED)
-
-set(ROS_VERSION $ENV{ROS_DISTRO})
-
-if (NOT "${ROS_VERSION}" MATCHES "(indigo|jade|kinetic)")
-    message(
-            FATAL_ERROR
-            "You must need ROS indigo or jade or kinetic(Your ROS version is '${ROS_VERSION}')"
-    )
-endif ()
+version https://git-lfs.github.com/spec/v1
+oid sha256:58577e866626041db4c28bf1004f9bcd664d77955347868f3c5e433c26a4c3dd
+size 348

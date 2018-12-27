@@ -1,33 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(sick_driver)
-
-find_package(catkin REQUIRED COMPONENTS
-    tf
-    roscpp
-    std_msgs
-)
-
-catkin_package(CATKIN_DEPENDS
-    roscpp
-    tf
-)
-
-include_directories(
-    ${catkin_INCLUDE_DIRS}
-    ${roscpp_INCLUDE_DIRS}
-    nodes/lms511/include/lms511
-)
-
-add_executable(lms511_node
-    nodes/lms511/src/lms5xx_node.cpp
-    nodes/lms511/src/SickLMS5xx.cc
-    nodes/lms511/src/SickLMS5xxBufferMonitor.cc
-    nodes/lms511/src/SickLMS5xxMessage.cc
-)
-add_dependencies(lms511_node
-    ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(lms511_node
-   ${catkin_LIBRARIES}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:b3de790c2b9a3d4b21314c58be67ef94025d66e0bd92e0a36395fce18f0557a6
+size 608

@@ -1,12 +1,3 @@
-add_library(velodyne_input input.cc)
-target_link_libraries(velodyne_input
-  ${catkin_LIBRARIES}
-  ${libpcap_LIBRARIES}
-)
-if(catkin_EXPORTED_TARGETS)
-  add_dependencies(velodyne_input ${catkin_EXPORTED_TARGETS})
-endif()
-
-install(TARGETS velodyne_input
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:731550180ef72121c0a767fab09b3a8ef61b384db945fa8d8a68fdef463632fa
+size 315

@@ -1,34 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(gnss)
-
-find_package(catkin REQUIRED COMPONENTS roscpp)
-
-catkin_package(
-        INCLUDE_DIRS include
-        LIBRARIES gnss
-)
-
-include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
-)
-
-add_library(gnss
-        src/geo_pos_conv.cpp
-        )
-
-target_link_libraries(gnss
-        ${catkin_LIBRARIES}
-        )
-
-install(DIRECTORY include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.hpp"
-        )
-
-
-install(TARGETS gnss
-        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        )
+version https://git-lfs.github.com/spec/v1
+oid sha256:60bd37a54d27147dc495487b3d412bc032fffdce5e3ddf15a5e66961f45a3d5f
+size 736

@@ -1,12 +1,3 @@
-When launched by roslaunch, orb_mapping may be unable to save the map, 
-especially for large ones. This is because roslaunch escalates signal to 
-SIGTERM or even SIGKILL, when timeout is reached. The current solution is 
-to modify the script:
-
-/opt/ros/indigo/lib/python2.7/dist-packages/roslaunch/nodeprocess.py
-
-Find the following line:
-_TIMEOUT_SIGINT  = 15.0 #seconds
-_TIMEOUT_SIGTERM = 2.0 #seconds
-
-and change to any large values.
+version https://git-lfs.github.com/spec/v1
+oid sha256:f65550015294f1d920ea4fd08dad3c3686e8a55f0266e654e881861eb7ac25e7
+size 436

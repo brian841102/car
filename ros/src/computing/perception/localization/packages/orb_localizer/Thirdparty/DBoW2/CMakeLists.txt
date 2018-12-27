@@ -1,14 +1,3 @@
-cmake_minimum_required(VERSION 2.8)
-project(DBoW2)
-
-find_package (OpenCV REQUIRED)
-
-add_library(DBoW2 STATIC
-	BowVector.cpp
-	FORB.cpp      
-	FeatureVector.cpp
-	ScoringObject.cpp
-	DUtils/Random.cpp
-	DUtils/Timestamp.cpp
-)
-target_link_libraries(DBoW2 ${OpenCV_LIBS})
+version https://git-lfs.github.com/spec/v1
+oid sha256:aaffcdbc1e22ef99cc54cc554d6e57269e3d81a2e1462ac2f0f9aed0cee120c0
+size 265

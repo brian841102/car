@@ -1,26 +1,3 @@
-# build the driver node
-add_executable(velodyne_node velodyne_node.cc driver.cc)
-add_dependencies(velodyne_node velodyne_driver_gencfg)
-target_link_libraries(velodyne_node
-  velodyne_input
-  ${catkin_LIBRARIES}
-  ${libpcap_LIBRARIES}
-)
-
-# build the nodelet version
-add_library(driver_nodelet nodelet.cc driver.cc)
-add_dependencies(driver_nodelet velodyne_driver_gencfg)
-target_link_libraries(driver_nodelet
-  velodyne_input
-  ${catkin_LIBRARIES}
-  ${libpcap_LIBRARIES}
-)
-
-# install runtime files
-install(TARGETS velodyne_node
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        COMPONENT main
-)
-install(TARGETS driver_nodelet
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:eb08bff5b069136cd31bec0e3f11f2f3fbc256578190232f48b4b49bae1657f5
+size 708

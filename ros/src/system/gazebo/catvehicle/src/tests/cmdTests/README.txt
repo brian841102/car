@@ -1,7 +1,3 @@
-Author: Jonathan Sprinkle
-
-This tests directory contains tests that command the simulated car in 
-Gazebo using only commands to the low-level joints and transmissions on
-the simulated car.
-
-The tests will run ONLY when the cmdvel2gazebo.py node is not running.
+version https://git-lfs.github.com/spec/v1
+oid sha256:97227e5a268d7d7100d5e357e41eda3c6586feb07ac0c078f8fe115944622614
+size 261

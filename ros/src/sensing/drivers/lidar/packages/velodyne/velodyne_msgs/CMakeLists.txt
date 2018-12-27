@@ -1,16 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(velodyne_msgs)
-
-find_package(catkin REQUIRED COMPONENTS message_generation std_msgs)
-
-add_message_files(
-  DIRECTORY msg
-  FILES
-  VelodynePacket.msg
-  VelodyneScan.msg
-)
-generate_messages(DEPENDENCIES std_msgs)
-
-catkin_package(
-  CATKIN_DEPENDS message_runtime std_msgs
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:27d1290720b894efe4ab23080e9c020ae3eeda2b5ff0a7cd59e674dfd6d2bf82
+size 319

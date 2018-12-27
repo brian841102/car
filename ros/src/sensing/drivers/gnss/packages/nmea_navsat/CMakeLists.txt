@@ -1,21 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(nmea_navsat)
-
-find_package(catkin REQUIRED 
-)
-
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES fake_drivers
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
-)
-
-###########
-## Build ##
-###########
-
-#add_executable(javad_tty nodes/javad_tty/javad_tty.cpp)
-#target_link_libraries(javad_tty
-#   ${catkin_LIBRARIES}
-#)
+version https://git-lfs.github.com/spec/v1
+oid sha256:0ab443a89a099931985c2b2a5f22f38d0aa14298277afb78b2f5fed7d68c588c
+size 373

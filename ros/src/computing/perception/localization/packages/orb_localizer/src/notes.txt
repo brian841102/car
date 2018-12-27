@@ -1,15 +1,3 @@
-How to write map
-1) Write signature, number of KeyFrame, MapPoint and mvpReferenceMapPoints
-2) Write serialization result of KeyFrames to fstream (one-by-one)
-3) Write serialization result of MapPoint to fstream (one-by-one)
-4) Write list of id of reference MapPoint (in single step)
-5) Write serialization of KeyFrameDatabase::mvInvertedFile (in single step)
-
-How to read map (tentative)
-
-
-
-
-
-Start mapper using --loadmap
-start NewCollege camera bag at 400
+version https://git-lfs.github.com/spec/v1
+oid sha256:18823d7d25bb34c2502889350fe293f915fd4aabc674ccdd231f19452f21e2c0
+size 457

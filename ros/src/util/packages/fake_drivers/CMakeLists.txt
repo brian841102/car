@@ -1,33 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(fake_drivers)
-
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  sensor_msgs
-  message_generation
-  cv_bridge
-)
-
-set(CMAKE_CXX_FLAGS "-std=c++11 -O2 -Wall ${CMAKE_CXX_FLAGS}")
-
-find_package(OpenCV REQUIRED)
-
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES fake_drivers
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs
-#  DEPENDS system_lib
-)
-
-###########
-## Build ##
-###########
-
-include_directories(include ${catkin_INCLUDE_DIRS})
-
-add_executable(fake_camera nodes/fake_camera/fake_camera.cpp)
-target_link_libraries(fake_camera
-   ${catkin_LIBRARIES}
-   opencv_highgui opencv_core opencv_imgproc
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:952901f91489a1345cf64f9b1e6957a6a78e1c48a80704a4e7c5f81877c6bf92
+size 658

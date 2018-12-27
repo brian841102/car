@@ -1,17 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(hokuyo)
-
-## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs)
-find_package(Boost 1.53 REQUIRED system serialization)
-
-## Declare a catkin package
-catkin_package(
-    DEPENDS roscpp sensor_msgs
-)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-include_directories(${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-
-add_executable(hokuyo_3d nodes/hokuyo_3d/hokuyo_3d.cpp nodes/hokuyo_3d/vssp.hpp)
-target_link_libraries(hokuyo_3d ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+version https://git-lfs.github.com/spec/v1
+oid sha256:fe185d4cfab6c47a2a8461234ae32cdd41b6ba433128880bbcd23527da79d979
+size 561
